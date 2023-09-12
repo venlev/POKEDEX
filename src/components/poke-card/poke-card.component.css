@@ -1,0 +1,40 @@
+.poke-card {
+    position: absolute;
+    width: 15%;
+    margin: 10px;
+}
+
+.poke-image-wrapper {
+    background-color: rgba(0, 0, 0, 0.199);
+    border-radius: 20px;
+    margin: 6px;
+    display: flex;
+    flex-direction: column;
+}
+
+.poke-image-wrapper > img {
+    width: 100%;
+}
+
+.poke-image-wrapper > .icon-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    width: 80%;
+    margin-top: 5px;
+    color: red;
+    align-self: center;
+}
+
+.topline {
+    margin: 10px;
+    display: flex;
+    direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: small;
+}
+
+.stats {
+    margin-top: 20px;
+}
