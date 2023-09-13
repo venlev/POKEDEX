@@ -1,6 +1,6 @@
 .poke-card {
-    position: absolute;
-    width: 15%;
+    position: relative;
+    width: 300px;
     margin: 10px;
 }
 
@@ -24,6 +24,10 @@
     margin-top: 5px;
     color: red;
     align-self: center;
+}
+
+.icon-wrapper * {
+    color: red;
 }
 
 .topline {

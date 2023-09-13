@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import PokeBadge from '../poke-badge/poke-badge.component';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton/IconButton';
 
 const PokeCard = () => {
     return (
@@ -18,7 +19,9 @@ const PokeCard = () => {
             <CardContent>
                 <div className="poke-image-wrapper">
                     <div className="icon-wrapper">
-                        <FavoriteBorderIcon />
+                        <IconButton>
+                            <FavoriteBorderIcon />
+                        </IconButton>
                     </div>
                     <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="" className="src" />
                 </div>
