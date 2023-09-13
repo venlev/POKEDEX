@@ -1,6 +1,7 @@
 import './search-page.css';
 import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
+import CancelIcon from '@mui/icons-material/Cancel';
 import IconButton from '@mui/material/IconButton';
 import AccountPanel from '../../components/account-panel/account-panel.component';
 import PokeCard from '../../components/poke-card/poke-card.component';
@@ -34,7 +35,12 @@ const SearchPage = () => {
                             <IconButton>
                                 <SearchIcon />
                             </IconButton>
-                        )
+                        ),
+                        endAdornment: (
+                            <IconButton>
+                                <CancelIcon />
+                            </IconButton>
+                        )  
                     }}
                 />
             </div>
