@@ -1,3 +1,4 @@
+import React from 'react';
 import './account-panel.component.css';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';

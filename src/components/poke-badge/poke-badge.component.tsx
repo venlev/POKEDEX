@@ -1,3 +1,4 @@
+import React from 'react';
 import './poke-badge.component.css'
 import Chip from '@mui/material/Chip';
 

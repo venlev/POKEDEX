@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import React from 'react';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import ShieldIcon from '@mui/icons-material/Shield';

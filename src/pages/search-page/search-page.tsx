@@ -1,3 +1,4 @@
+import React from 'react';
 import './search-page.css';
 import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
