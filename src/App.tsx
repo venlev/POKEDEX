@@ -1,13 +1,16 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import PokeCard from './components/poke-card/poke-card.component';
 import SearchPage from './pages/search-page/search-page';
+import WelcomePage from './pages/welcome-page/welcome-page';
+import { Routes, Route } from 'react-router';
 
 function App() {
   return (
     <div className="App">
-      <SearchPage/>
+      <Routes>
+        <Route path='/' element={<WelcomePage/>}></Route>
+        <Route path='/search' element={<SearchPage />}></Route>
+      </Routes>
     </div>
   );
 }

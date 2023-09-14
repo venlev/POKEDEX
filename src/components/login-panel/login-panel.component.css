@@ -1,0 +1,26 @@
+#login-panel {
+    border: 1px solid rgba(0, 0, 0, 0.507);
+    margin: 10px 20px;
+    border-radius: 20px;
+}
+
+.tab-panel-backdrop {
+    background-color: rgba(0, 0, 0, 0.089) !important;
+    border-radius: 20px;
+}
+
+.simple-title {
+    margin: 0px;
+}
+
+#login-form {
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#login-form .login-textfield {
+    width: 50%;
+    align-self: center;
+}

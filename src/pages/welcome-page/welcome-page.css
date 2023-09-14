@@ -1,0 +1,12 @@
+#welcome-field {
+    width: 50%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    margin-top: 20px;
+    height: 80%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+}

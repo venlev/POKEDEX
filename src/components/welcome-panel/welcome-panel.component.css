@@ -1,0 +1,34 @@
+.name-inquiry {
+    letter-spacing: 2px;
+}
+
+#welcome-panel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    background-color: rgba(0, 0, 0, 0.062);
+    margin: 20px;
+    border-radius: 20px;
+}
+
+#name-inquiry-wrapper {
+    width: 50%;
+    padding-bottom: 10px;
+}
+
+#nickname-field {
+    margin: 10px;
+} 
+
+#name-inquiry-wrapper > div {
+    width: 100%;
+    margin: 20px 10px;
+}
+
+#pokemon-type-selection {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    justify-content: center;
+}
