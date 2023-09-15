@@ -38,3 +38,7 @@
     margin-top: 20px;
     margin-bottom: 40px;
 }
+
+.selected {
+    border: 3px dashed black !important;
+}
