@@ -6,20 +6,24 @@ import SpaIcon from '@mui/icons-material/Spa';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import SaveIcon from '@mui/icons-material/Save';
 import Fab from '@mui/material/Fab';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, onSnapshot } from '@firebase/firestore';
-import { PokemonTypes } from '../../typedefinitions/pokemon-typedefs';
+import { collection, onSnapshot, addDoc } from '@firebase/firestore';
+import { FavouritePokemonTypeList, PokemonTypes } from '../../typedefinitions/pokemon-typedefs';
+import { UserData } from '../../typedefinitions/user-data-typedefs';
+import { useNavigate } from 'react-router-dom';
+import { getUser } from '../../services/user-store.service';
 
 const WelcomePanel = () => {
 
+    const navigate = useNavigate();
     const [nickname, setNickname] = useState('');
     const [favouritePokemonTypes, setFavouritePokemonTypes] = useState({
         fire: false,
         grass: false,
         electric: false
-    });
-    const [userData, setUserData] = useState();
+    } as FavouritePokemonTypeList);
+    const [UID, setUID] = useState();
     const [, refreshState] = useState({})
 
     useEffect(() => {
@@ -31,7 +35,17 @@ const WelcomePanel = () => {
     }, []);
 
     const saveAccountSettings = () => {
-        console.log(favouritePokemonTypes, nickname);
+        const _uid = getUser().user.uid;
+        const data: UserData = {
+            uid: _uid,
+            nickname: nickname,
+            favouritePokemonTypes: favouritePokemonTypes,
+            favouritePokemonList: []
+        }
+        const _collectionReference = collection(db, 'user-data');
+        addDoc(_collectionReference, data).then(() => {
+            navigate("/search");
+        }).catch(err=> console.log(err));
     }
 
     const updateAccountSettings = () => {

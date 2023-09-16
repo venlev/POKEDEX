@@ -7,7 +7,11 @@ import IconButton from '@mui/material/IconButton/IconButton';
 import Button from '@mui/material/Button';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-const AccountPanel = () => {
+type AccountPanelProps = {
+    nickname: string
+}
+
+const AccountPanel = (props: AccountPanelProps) => {
     return (
         <Card variant="outlined">
             <CardContent>
@@ -15,7 +19,7 @@ const AccountPanel = () => {
                     <div id="image-wrapper">
                         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="" />
                     </div>
-                    <span id="username">Mr. Raptor</span>
+                    <span id="username">{props.nickname}</span>
                     <div className="logout-action-wrapper">
                         <IconButton>
                             <LogoutIcon />

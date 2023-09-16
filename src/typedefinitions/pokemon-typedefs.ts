@@ -1,6 +1,6 @@
 export type PokemonTypes = 'fire' | 'grass' | 'electric';
 
-export type FavouritePokemonsList = {
+export type FavouritePokemonTypeList = {
     fire: boolean,
     grass: boolean,
     electric: boolean
