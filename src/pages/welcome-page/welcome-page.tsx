@@ -11,8 +11,6 @@ const WelcomePage = () => {
         return sessionStorage.length > 0 && getUser().user ? <WelcomePanel /> : <LoginManager />
     }
 
-    showLoginOrWelcomePanel();
-
     return (
         <Paper elevation={3} id='welcome-field'>
             <h1>Welcome to our Pokedex</h1>

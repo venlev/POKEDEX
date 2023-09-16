@@ -3,6 +3,7 @@
     flex-direction: row;
     justify-content: flex-start;
     gap: 20px;
+    flex-wrap: wrap;
 }
 
 #image-wrapper > img {
@@ -21,6 +22,7 @@
 #username {
     font-size: large;
     font-family: sans-serif;
+    word-break: normal;
 }
 
 .favourite-link {

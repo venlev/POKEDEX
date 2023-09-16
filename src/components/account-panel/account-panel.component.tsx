@@ -5,6 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import LogoutIcon from '@mui/icons-material/Logout';
 import IconButton from '@mui/material/IconButton/IconButton';
 import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 type AccountPanelProps = {
@@ -12,6 +13,14 @@ type AccountPanelProps = {
 }
 
 const AccountPanel = (props: AccountPanelProps) => {
+
+    const navigate = useNavigate();
+
+    const logout = () => {
+        sessionStorage.clear();
+        navigate("/");
+    }
+
     return (
         <Card variant="outlined">
             <CardContent>
@@ -21,8 +30,8 @@ const AccountPanel = (props: AccountPanelProps) => {
                     </div>
                     <span id="username">{props.nickname}</span>
                     <div className="logout-action-wrapper">
-                        <IconButton>
-                            <LogoutIcon />
+                        <IconButton onClick={logout}>
+                            <LogoutIcon/>
                         </IconButton>
                     </div>
                 </div>
