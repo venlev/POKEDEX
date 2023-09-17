@@ -25,6 +25,7 @@ const SearchPage = () => {
     const [timeoutContext, setTimeoutContext] = useState(setTimeout(() => { }, 0));
     const [pokemonCardResultList, setPokemonCardResultList] = useState([] as PokemonCard[]);
     const [, setNewState] = useState({});
+    const [statPanelData, setStatPanelData] = useState({ data: {} as PokemonCard, open: false });
 
     useEffect(() => {
 
@@ -80,11 +81,22 @@ const SearchPage = () => {
         setNewState({});
     }
 
+    const pokemonCardOnClick = (cardData: PokemonCard) => {
+        setStatPanelData({ data: cardData, open: true });
+    }
+
     const renderPokeCards = () => {
         let PokeCardList = [];
         if (pokemonCardResultList.length > 0) {
             for (let pokemonResultCard of pokemonCardResultList) {
-                PokeCardList.push(<PokeCard data={pokemonResultCard} searchTerm={pokemonName} updateFavourites={(v: string[]) => updateFavourites(v)} />)
+                PokeCardList.push(
+                    <div onClick={e => pokemonCardOnClick(pokemonResultCard)}>
+                        <PokeCard
+                            data={pokemonResultCard}
+                            searchTerm={pokemonName}
+                            updateFavourites={(v: string[]) => updateFavourites(v)}
+                        />
+                    </div>);
             }
         }
 
@@ -106,14 +118,10 @@ const SearchPage = () => {
         )
     }
 
-    const renderStatPanel = () => {
-        return <StatPanel />
-    }
-
     const searchPageMainContent = () => {
         return (
             <div id="search-page-main">
-                {renderStatPanel()}
+                <StatPanel open={statPanelData.open} close={(e: boolean) => { if (e) statPanelData.open = false; console.log(statPanelData) }} />
                 <div className="search-wrapper">
                     <TextField
                         placeholder="Search Pokémon..."

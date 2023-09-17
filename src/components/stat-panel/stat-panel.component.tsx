@@ -5,7 +5,7 @@ import Backdrop from '@mui/material/Backdrop';
 import IconButton from '@mui/material/IconButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, ButtonGroup, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, useMediaQuery, useTheme } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
@@ -13,17 +13,30 @@ import ShieldIcon from '@mui/icons-material/Shield';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
+import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
 
-const StatPanel = () => {
-    const [open, setOpen] = useState(true);
+export type StatPanelProps = {
+    data?: PokemonCard
+    open: boolean
+    close: any,
+}
+
+const StatPanel = (props: StatPanelProps) => {
+    const [open, setOpen] = useState(props.open || false);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+
+    useEffect(() => {
+        setOpen(props.open);
+    }, [props.open])
 
     const handleClickOpen = () => {
         setOpen(true);
     };
 
     const handleClose = () => {
+        props.close(true);
         setOpen(false);
     };
 
@@ -56,14 +69,16 @@ const StatPanel = () => {
                         <div id="left-side">
                             <div className="stats">
                                 <table className='stat-panel-table'>
-                                    <tr>
-                                        <td><Chip icon={<FavoriteIcon />} label={'HP ' + '35'} variant="outlined" /></td>
-                                        <td><Chip icon={<WhatshotIcon />} label={'ATK ' + '40'} variant="outlined" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td><Chip icon={<ShieldIcon />} label={'DEF ' + '75'} variant="outlined" /></td>
-                                        <td><Chip icon={<AutoFixHighIcon />} label={'SP ' + '24'} variant="outlined" /></td>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <td><Chip icon={<FavoriteIcon />} label={'HP ' + '35'} variant="outlined" /></td>
+                                            <td><Chip icon={<WhatshotIcon />} label={'ATK ' + '40'} variant="outlined" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><Chip icon={<ShieldIcon />} label={'DEF ' + '75'} variant="outlined" /></td>
+                                            <td><Chip icon={<AutoFixHighIcon />} label={'SP ' + '24'} variant="outlined" /></td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                             <div className="male-female-selection-menu">

@@ -20,7 +20,7 @@ import { getUser } from '../../services/user-store.service';
 export type PokeCardProps = {
     data: PokemonCard,
     searchTerm?: string,
-    updateFavourites?: any
+    updateFavourites?: any,
 };
 
 const PokeCard = (props: PokeCardProps) => {
@@ -45,8 +45,8 @@ const PokeCard = (props: PokeCardProps) => {
                 setMyFavouritePokemons(favouritePokemonList);
 
                 updateDoc(userDataDBRef, { favouritePokemonList: favouritePokemonList })
-                    .then(() => { 
-                        setNextFavourite(''); 
+                    .then(() => {
+                        setNextFavourite('');
                         props.updateFavourites(favouritePokemonList);
                     })
                     .catch(err => { console.log(err) });
@@ -91,13 +91,13 @@ const PokeCard = (props: PokeCardProps) => {
     const getHeartIcon = (pokemonName: string) => {
         if (myFavouritePokemons.includes(pokemonName)) {
             return (
-                <IconButton onClick={() => removeFromFavourites(props.data.name)}>
+                <IconButton onClick={(e) => { removeFromFavourites(props.data.name); e.stopPropagation(); }}>
                     <FavoriteIcon />
                 </IconButton>
             )
         } else {
             return (
-                <IconButton onClick={() => addToFavourites(props.data.name)}>
+                <IconButton onClick={(e) => { addToFavourites(props.data.name); e.stopPropagation(); }}>
                     <FavoriteBorderIcon />
                 </IconButton>
             )
