@@ -12,42 +12,45 @@ const getAllPokemonNames = () => {
     });
 }
 
-const getPokeCardDataList = (suggestionList: string[]) => {
-    let queryPromisesList: Promise<any>[] = [];
-    let pokemonCardPreps: PokemonCard[] = [];
+const getPokeCardDataList = (suggestionList: string[]): Promise<PokemonCard[]> => {
+    return new Promise(resolve => {
+        let queryPromisesList: Promise<any>[] = [];
+        let pokemonCardPreps: PokemonCard[] = [];
 
-    suggestionList.forEach(suggestedPokemon => {
-        queryPromisesList.push(axios.get(`https://pokeapi.co/api/v2/pokemon/${suggestedPokemon}`));
-    });
+        if (suggestionList.length && suggestionList.length > 0) {
 
-    Promise.all(queryPromisesList).then(pokeResponseData => {
-        for (let result of pokeResponseData) {
-            const pokemonData = result.data;
+            suggestionList.forEach(suggestedPokemon => {
+                queryPromisesList.push(axios.get(`https://pokeapi.co/api/v2/pokemon/${suggestedPokemon}`));
+            });
 
-            const newPokemonCard: PokemonCard = {
-                img: 'pokemonData.sprites.front_default',
-                name: pokemonData.name,
-                type: pokemonData.types[0].type.name,
-                stats: {
-                    hp: pokemonData.stats.filter((stat: { name: string; base_stat: number; }) => { if (stat.name === 'hp') return stat.base_stat }),
-                    sp: pokemonData.stats.filter((stat: { name: string; base_stat: number; }) => { if (stat.name === 'special-attack') return stat.base_stat }),
-                    atk: pokemonData.stats.filter((stat: { name: string; base_stat: number; }) => { if (stat.name === 'attack') return stat.base_stat }),
-                    def: pokemonData.stats.filter((stat: { name: string; base_stat: number; }) => { if (stat.name === 'defense') return stat.base_stat })
+            Promise.all(queryPromisesList).then(pokeResponseData => {
+                for (let result of pokeResponseData) {
+                    const pokemonData = result.data;
+
+                    let statStore: { [key: string]: number } = {};
+
+                    pokemonData.stats.forEach((stat: { base_stat: number, stat: { name: string } }) => {
+                        statStore[stat.stat.name] = stat.base_stat
+                    });
+
+                    const newPokemonCard: PokemonCard = {
+                        img: pokemonData.sprites.front_default,
+                        name: pokemonData.name,
+                        type: pokemonData.types[0].type.name,
+                        stats: {
+                            hp: statStore.hp,
+                            sp: statStore['special-attack'],
+                            atk: statStore.attack,
+                            def: statStore.defense
+                        }
+                    }
+                    pokemonCardPreps.push(newPokemonCard);
                 }
-            }
-            pokemonCardPreps.push(newPokemonCard);
+                resolve(pokemonCardPreps);
+            });
+
         }
-
-        console.log(pokemonCardPreps);
-    });
-
-    /*
-
-    we should return Promise<PokeCardData>[]
-    if (queryPromisesList.length > 0) {
-        return Promise.all(queryPromisesList);
-    }
-    */
+    })
 }
 
 type URL = string;

@@ -13,8 +13,13 @@ import PokeBadge from '../poke-badge/poke-badge.component';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton/IconButton';
+import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
 
-const PokeCard = () => {
+export type PokeCardProps = {
+    data: PokemonCard
+};
+
+const PokeCard = (props: PokeCardProps) => {
     return (
         <Card className='poke-card'>
             <CardContent>
@@ -24,12 +29,12 @@ const PokeCard = () => {
                             <FavoriteBorderIcon />
                         </IconButton>
                     </div>
-                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="" className="src" />
+                    <img src={props.data.img} alt="" className="src" />
                 </div>
                 <div className="info-panel">
                     <div className="topline">
                         <Typography variant="subtitle1" gutterBottom>
-                            Pikachu
+                            {props.data.name}
                         </Typography>
                         <PokeBadge />
                     </div>

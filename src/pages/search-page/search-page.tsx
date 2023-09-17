@@ -19,21 +19,29 @@ import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
 const SearchPage = () => {
 
     const [pokemonName, setPokemonName] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
     const [loggedInUser, setLoggedInUser] = useState({} as UserData);
     const [pokemons, setPokemons] = useState(['']);
+    const [timeoutContext, setTimeoutContext] = useState(setTimeout(() => { }, 0));
+    const [pokemonCardResultList, setPokemonCardResultList] = useState([] as PokemonCard[])
 
     useEffect(() => {
-        /*
-        getPokemonByName(pokemonName).then(data => {
-            //console.log(data);
-        });
-        */
 
-        let suggestionList: string[] = searchInList(pokemonName, pokemons);
-        let pokeCardDataList: PokemonCard[];
+        /* TIMER TO WAIT USER TO FINISH TYPING BEFORE SENDING OUT TOO MANY REQS*/
+        const pauseMillis = 2000; /* WAIT THIS AMOUNT OF TIME AFTER LAST KS*/
+        if (timeoutContext) clearTimeout(timeoutContext);
 
-        getPokeCardDataList(suggestionList);
+        if (pokemonName && pokemonName.length > 0) {
+            let typePauseTimer = setTimeout(() => {
+                console.log('search with: ', pokemonName)
+                let suggestionList: string[] = searchInList(pokemonName, pokemons);
+                getPokeCardDataList(suggestionList).then(pokemonCardResultList => {
+                    setPokemonCardResultList(pokemonCardResultList);
+                    console.log(pokemonCardResultList);
+                });
+            }, pauseMillis);
+
+            setTimeoutContext(typePauseTimer);
+        }
 
         //console.log(`search: ${pokemonName} results: `, suggestionList);
     }, [pokemonName]);
@@ -53,6 +61,18 @@ const SearchPage = () => {
 
     const makeSearch = (e: any) => {
         setPokemonName(e.target.value);
+    }
+
+    const renderPokeCards = () => {
+        let PokeCardList = [];
+
+        if (pokemonCardResultList.length > 0) {
+            for (let pokemonResultCard of pokemonCardResultList) {
+                PokeCardList.push(<PokeCard data={pokemonResultCard} />)
+            }
+        }
+
+        return PokeCardList;
     }
 
     const searchPageMainContent = () => {
@@ -81,12 +101,7 @@ const SearchPage = () => {
                     <AccountPanel nickname={loggedInUser.nickname} />
                 </div>
                 <div id="poke-card-list-wrapper">
-                    <PokeCard />
-                    <PokeCard />
-                    <PokeCard />
-                    <PokeCard />
-                    <PokeCard />
-                    <PokeCard />
+                    { renderPokeCards() }
                 </div>
             </div>
         );
