@@ -90,7 +90,7 @@ const SearchPage = () => {
         if (pokemonCardResultList.length > 0) {
             for (let pokemonResultCard of pokemonCardResultList) {
                 PokeCardList.push(
-                    <div onClick={e => pokemonCardOnClick(pokemonResultCard)}>
+                    <div onClick={e => {pokemonCardOnClick(pokemonResultCard); e.stopPropagation();}}>
                         <PokeCard
                             data={pokemonResultCard}
                             searchTerm={pokemonName}
@@ -121,7 +121,10 @@ const SearchPage = () => {
     const searchPageMainContent = () => {
         return (
             <div id="search-page-main">
-                <StatPanel open={statPanelData.open} close={(e: boolean) => { if (e) statPanelData.open = false; console.log(statPanelData) }} />
+                <StatPanel
+                    open={statPanelData.open}
+                    close={(e: boolean) => { if (e) statPanelData.open = false; }}
+                    data={statPanelData.data} />
                 <div className="search-wrapper">
                     <TextField
                         placeholder="Search Pokémon..."

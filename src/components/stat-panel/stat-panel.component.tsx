@@ -16,7 +16,7 @@ import FemaleIcon from '@mui/icons-material/Female';
 import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
 
 export type StatPanelProps = {
-    data?: PokemonCard
+    data: PokemonCard
     open: boolean
     close: any,
 }
@@ -28,8 +28,8 @@ const StatPanel = (props: StatPanelProps) => {
 
 
     useEffect(() => {
-        setOpen(props.open);
-    }, [props.open])
+        if (props.open) handleClickOpen();
+    }, [props])
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -40,74 +40,82 @@ const StatPanel = (props: StatPanelProps) => {
         setOpen(false);
     };
 
-    return (
-        <div>
-            <Dialog
-                id='#stat-dialog'
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="responsive-dialog-title"
-            >
-                <DialogTitle id="responsive-dialog-title">
-                    <div className="stat-panel-action-bar">
-                        <div className="name-type">
-                            <h1 className="name">Pikachu</h1>
-                            <PokeBadge type='electric' />
-                        </div>
-                        <div className="action-buttons">
-                            <IconButton>
-                                <FavoriteBorderIcon />
-                            </IconButton>
-                            <IconButton>
-                                <CancelIcon />
-                            </IconButton>
-                        </div>
-                    </div>
-                </DialogTitle>
-                <DialogContent>
-                    <div id="stat-content">
-                        <div id="left-side">
-                            <div className="stats">
-                                <table className='stat-panel-table'>
-                                    <tbody>
-                                        <tr>
-                                            <td><Chip icon={<FavoriteIcon />} label={'HP ' + '35'} variant="outlined" /></td>
-                                            <td><Chip icon={<WhatshotIcon />} label={'ATK ' + '40'} variant="outlined" /></td>
-                                        </tr>
-                                        <tr>
-                                            <td><Chip icon={<ShieldIcon />} label={'DEF ' + '75'} variant="outlined" /></td>
-                                            <td><Chip icon={<AutoFixHighIcon />} label={'SP ' + '24'} variant="outlined" /></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+    const renderStatPanelDialog = () => {
+        return (
+            <div>
+                <Dialog
+                    id='#stat-dialog'
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="responsive-dialog-title"
+                >
+                    <DialogTitle id="responsive-dialog-title">
+                        <div className="stat-panel-action-bar">
+                            <div className="name-type">
+                                <h1 className="name">{props.data.name}</h1>
+                                <PokeBadge type={props.data.type} />
                             </div>
-                            <div className="male-female-selection-menu">
-                                <IconButton >
-                                    <FemaleIcon className='mf-selector' />
+                            <div className="action-buttons">
+                                <IconButton>
+                                    <FavoriteBorderIcon />
                                 </IconButton>
                                 <IconButton>
-                                    <MaleIcon className='mf-selector' />
+                                    <CancelIcon />
                                 </IconButton>
                             </div>
-                            <div className="front-back-selection-menu">
-                                <ButtonGroup
-                                    color='info'
-                                    fullWidth
-                                    variant="contained"
-                                    aria-label="Disabled elevation buttons"
-                                >
-                                    <Button>Front</Button>
-                                    <Button>Back</Button>
-                                </ButtonGroup>
+                        </div>
+                    </DialogTitle>
+                    <DialogContent>
+                        <div id="stat-content">
+                            <div id="left-side">
+                                <div className="stats">
+                                    <table className='stat-panel-table'>
+                                        <tbody>
+                                            <tr>
+                                                <td><Chip icon={<FavoriteIcon />} label={'HP ' + props.data.stats.hp} variant="outlined" /></td>
+                                                <td><Chip icon={<WhatshotIcon />} label={'ATK ' + props.data.stats.atk} variant="outlined" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td><Chip icon={<ShieldIcon />} label={'DEF ' + props.data.stats.def} variant="outlined" /></td>
+                                                <td><Chip icon={<AutoFixHighIcon />} label={'SP ' + props.data.stats.sp} variant="outlined" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="male-female-selection-menu">
+                                    <IconButton >
+                                        <FemaleIcon className='mf-selector' />
+                                    </IconButton>
+                                    <IconButton>
+                                        <MaleIcon className='mf-selector' />
+                                    </IconButton>
+                                </div>
+                                <div className="front-back-selection-menu">
+                                    <ButtonGroup
+                                        color='info'
+                                        fullWidth
+                                        variant="contained"
+                                        aria-label="Disabled elevation buttons"
+                                    >
+                                        <Button>Front</Button>
+                                        <Button>Back</Button>
+                                    </ButtonGroup>
+                                </div>
+                            </div>
+                            <div id="rigth-side">
+                                <img src={props.data.img} alt="" className='pokemon-preview' />
                             </div>
                         </div>
-                        <div id="rigth-side">
-                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png" alt="" className='pokemon-preview' />
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </div>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        )
+    }
+
+    return (
+        <>
+            {props.data.name ? renderStatPanelDialog() : <></>}
+        </>
     );
 }
 
