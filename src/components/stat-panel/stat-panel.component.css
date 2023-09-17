@@ -1,0 +1,77 @@
+#stat-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-panel-action-bar {
+    display: flex;
+    flex-direction: row;
+}
+
+.action-buttons {
+    justify-self: flex-end;
+    margin-left: auto;
+}
+
+.name {
+    margin: 0px;
+}
+
+#stat-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#left-side {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+#right-side {
+    width: 50%;
+    display: flex;
+    direction: column;
+}
+
+.male-female-selection-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.mf-selector {
+    width: 100px !important;
+    height: 100px !important;
+}
+
+.stat-panel-table {
+    width: 100%;
+}
+
+.stat-panel-table td {
+    text-align: center;
+    padding: 6px;
+}
+
+.pokemon-preview {
+    width: 250px;
+    height: 250px;
+}
+
+.front-back-selection-menu {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+#\#stat-dialog>div.MuiDialog-container.MuiDialog-scrollPaper.css-hz1bth-MuiDialog-container>div {
+    width: 80%;
+}

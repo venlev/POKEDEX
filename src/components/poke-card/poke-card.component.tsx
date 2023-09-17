@@ -1,9 +1,7 @@
 import './poke-card.component.css';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import React from 'react';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import ShieldIcon from '@mui/icons-material/Shield';
@@ -21,7 +19,8 @@ import { getUser } from '../../services/user-store.service';
 
 export type PokeCardProps = {
     data: PokemonCard,
-    searchTerm?: string
+    searchTerm?: string,
+    updateFavourites?: any
 };
 
 const PokeCard = (props: PokeCardProps) => {
@@ -46,7 +45,10 @@ const PokeCard = (props: PokeCardProps) => {
                 setMyFavouritePokemons(favouritePokemonList);
 
                 updateDoc(userDataDBRef, { favouritePokemonList: favouritePokemonList })
-                    .then(() => { setNextFavourite(''); })
+                    .then(() => { 
+                        setNextFavourite(''); 
+                        props.updateFavourites(favouritePokemonList);
+                    })
                     .catch(err => { console.log(err) });
             }).catch(err => { console.log(err) });
         }

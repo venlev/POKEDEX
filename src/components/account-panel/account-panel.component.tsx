@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 type AccountPanelProps = {
-    nickname: string
+    nickname: string,
+    showFavourites?: any;
 }
 
 const AccountPanel = (props: AccountPanelProps) => {
@@ -19,6 +20,10 @@ const AccountPanel = (props: AccountPanelProps) => {
     const logout = () => {
         sessionStorage.clear();
         navigate("/");
+    }
+
+    const showFavouritesEvent = () => {
+        props.showFavourites()
     }
 
     return (
@@ -31,12 +36,12 @@ const AccountPanel = (props: AccountPanelProps) => {
                     <span id="username">{props.nickname}</span>
                     <div className="logout-action-wrapper">
                         <IconButton onClick={logout}>
-                            <LogoutIcon/>
+                            <LogoutIcon />
                         </IconButton>
                     </div>
                 </div>
                 <div className="favourite-link">
-                    <Button size="large">Favourite Pokemons <ArrowForwardIosIcon/></Button>
+                    <Button size="large" onClick={showFavouritesEvent}>Favourite Pokemons <ArrowForwardIosIcon /></Button>
                 </div>
             </CardContent>
         </Card>

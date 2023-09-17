@@ -15,6 +15,7 @@ import { getUser } from '../../services/user-store.service';
 import PokedexLoader from '../../components/loader/loader.component';
 import { searchInList } from '../../services/search.service';
 import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
+import StatPanel from '../../components/stat-panel/stat-panel.component';
 
 const SearchPage = () => {
 
@@ -22,15 +23,17 @@ const SearchPage = () => {
     const [loggedInUser, setLoggedInUser] = useState({} as UserData);
     const [pokemons, setPokemons] = useState(['']);
     const [timeoutContext, setTimeoutContext] = useState(setTimeout(() => { }, 0));
-    const [pokemonCardResultList, setPokemonCardResultList] = useState([] as PokemonCard[])
+    const [pokemonCardResultList, setPokemonCardResultList] = useState([] as PokemonCard[]);
+    const [, setNewState] = useState({});
 
     useEffect(() => {
 
         /* TIMER TO WAIT USER TO FINISH TYPING BEFORE SENDING OUT TOO MANY REQS*/
         const pauseMillis = 2000; /* WAIT THIS AMOUNT OF TIME AFTER LAST KS*/
         if (timeoutContext) clearTimeout(timeoutContext);
+        let isFavouritesAvailable: boolean = (loggedInUser.favouritePokemonList && loggedInUser.favouritePokemonList.length > 0);
 
-        if (pokemonName && pokemonName.length > 0) {
+        if (pokemonName && pokemonName.length > 0 && pokemonName !== 'favourites') {
             let typePauseTimer = setTimeout(() => {
                 let suggestionList: string[] = searchInList(pokemonName, pokemons);
                 getPokeCardDataList(suggestionList).then(pokemonCardResultList => {
@@ -39,6 +42,13 @@ const SearchPage = () => {
             }, pauseMillis);
 
             setTimeoutContext(typePauseTimer);
+        }
+
+
+        if (pokemonName === 'favourites' && isFavouritesAvailable) {
+            getPokeCardDataList(loggedInUser.favouritePokemonList).then(pokemonCardResultList => {
+                setPokemonCardResultList(pokemonCardResultList);
+            });
         }
 
         //console.log(`search: ${pokemonName} results: `, suggestionList);
@@ -65,21 +75,45 @@ const SearchPage = () => {
         setPokemonName('');
     }
 
+    const updateFavourites = (updatedFavourites: string[]) => {
+        loggedInUser.favouritePokemonList = updatedFavourites;
+        setNewState({});
+    }
+
     const renderPokeCards = () => {
         let PokeCardList = [];
-
         if (pokemonCardResultList.length > 0) {
             for (let pokemonResultCard of pokemonCardResultList) {
-                PokeCardList.push(<PokeCard data={pokemonResultCard} searchTerm={pokemonName} />)
+                PokeCardList.push(<PokeCard data={pokemonResultCard} searchTerm={pokemonName} updateFavourites={(v: string[]) => updateFavourites(v)} />)
             }
         }
 
         return PokeCardList;
     }
 
+    const showFavourites = () => {
+        setPokemonName('favourites');
+    }
+
+    const renderSearchHint = () => {
+        return (
+            <div id="search-hint">
+                <h1>Start typing for search...</h1>
+                <span>There is nothing to see yet; please start a search, and you can find your favourite pokemons. This search is powered by POKEAPI.CO!
+                    Do you know that there are over a 1000 pokemons to choose from? You can mark your favourite ones to find them later.
+                    If you have some pokemons marked, you can click on the "FAVOURITE POKEMONS" link or search "favourites" to see them!</span>
+            </div>
+        )
+    }
+
+    const renderStatPanel = () => {
+        return <StatPanel />
+    }
+
     const searchPageMainContent = () => {
         return (
             <div id="search-page-main">
+                {renderStatPanel()}
                 <div className="search-wrapper">
                     <TextField
                         placeholder="Search Pokémon..."
@@ -101,11 +135,11 @@ const SearchPage = () => {
                     />
                 </div>
                 <div className="account-panel-wrapper">
-                    <AccountPanel nickname={loggedInUser.nickname} />
+                    <AccountPanel nickname={loggedInUser.nickname} showFavourites={showFavourites} />
                 </div>
                 <div className="card-list-scroller">
                     <div id="poke-card-list-wrapper">
-                        {renderPokeCards()}
+                        {pokemonName === '' ? renderSearchHint() : renderPokeCards()}
                     </div>
                 </div>
             </div>
