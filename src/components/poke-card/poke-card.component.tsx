@@ -16,10 +16,28 @@ import IconButton from '@mui/material/IconButton/IconButton';
 import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
 
 export type PokeCardProps = {
-    data: PokemonCard
+    data: PokemonCard,
+    searchTerm?: string
 };
 
 const PokeCard = (props: PokeCardProps) => {
+
+    const getHighlightedName = () => {
+        if (props.searchTerm) {
+            const searchTerm: string = props.searchTerm;
+            const normalAndHighlightSeparation = props.data.name.split(new RegExp(`(${searchTerm})`, 'gi'));
+            return (
+                <span> {normalAndHighlightSeparation.map((text, i) =>
+                    <span key={i} style={text.toLowerCase() === searchTerm.toLowerCase() ? { fontWeight: 'bold' } : {}}>
+                        {text}
+                    </span>)
+                }
+                </span>
+            )
+        }
+        return props.data.name;
+    }
+
     return (
         <Card className='poke-card'>
             <CardContent>
@@ -34,7 +52,7 @@ const PokeCard = (props: PokeCardProps) => {
                 <div className="info-panel">
                     <div className="topline">
                         <Typography variant="subtitle1" gutterBottom>
-                            {props.data.name}
+                            {getHighlightedName()}
                         </Typography>
                         <PokeBadge type={props.data.type} />
                     </div>

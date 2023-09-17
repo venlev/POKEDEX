@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PokemonCard } from '../typedefinitions/pokemon-typedefs';
+import noImageAvailable from '../assets/no_image_available.png'
 
 const getAllPokemonNames = () => {
     return new Promise(resolve => {
@@ -34,7 +35,7 @@ const getPokeCardDataList = (suggestionList: string[]): Promise<PokemonCard[]> =
                     });
 
                     const newPokemonCard: PokemonCard = {
-                        img: pokemonData.sprites.front_default,
+                        img: pokemonData.sprites.front_default ? pokemonData.sprites.front_default : noImageAvailable,
                         name: pokemonData.name,
                         type: pokemonData.types[0].type.name,
                         stats: {

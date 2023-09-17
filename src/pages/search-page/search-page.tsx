@@ -72,7 +72,7 @@ const SearchPage = () => {
 
         if (pokemonCardResultList.length > 0) {
             for (let pokemonResultCard of pokemonCardResultList) {
-                PokeCardList.push(<PokeCard data={pokemonResultCard} />)
+                PokeCardList.push(<PokeCard data={pokemonResultCard} searchTerm={pokemonName} />)
             }
         }
 
@@ -95,8 +95,8 @@ const SearchPage = () => {
                                 </IconButton>
                             ),
                             endAdornment: (
-                                <IconButton>
-                                    <CancelIcon onClick={clearSearch} />
+                                <IconButton onClick={clearSearch}>
+                                    <CancelIcon />
                                 </IconButton>
                             )
                         }}
@@ -105,8 +105,10 @@ const SearchPage = () => {
                 <div className="account-panel-wrapper">
                     <AccountPanel nickname={loggedInUser.nickname} />
                 </div>
-                <div id="poke-card-list-wrapper">
-                    {renderPokeCards()}
+                <div className="card-list-scroller">
+                    <div id="poke-card-list-wrapper">
+                        {renderPokeCards()}
+                    </div>
                 </div>
             </div>
         );
