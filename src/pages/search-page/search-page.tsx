@@ -32,11 +32,9 @@ const SearchPage = () => {
 
         if (pokemonName && pokemonName.length > 0) {
             let typePauseTimer = setTimeout(() => {
-                console.log('search with: ', pokemonName)
                 let suggestionList: string[] = searchInList(pokemonName, pokemons);
                 getPokeCardDataList(suggestionList).then(pokemonCardResultList => {
                     setPokemonCardResultList(pokemonCardResultList);
-                    console.log(pokemonCardResultList);
                 });
             }, pauseMillis);
 

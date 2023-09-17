@@ -14,6 +14,10 @@ import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton/IconButton';
 import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
+import { useEffect, useState } from 'react';
+import { db } from '../../firebase';
+import { collection, query, where, getDocs, updateDoc, doc } from '@firebase/firestore';
+import { getUser } from '../../services/user-store.service';
 
 export type PokeCardProps = {
     data: PokemonCard,
@@ -21,6 +25,31 @@ export type PokeCardProps = {
 };
 
 const PokeCard = (props: PokeCardProps) => {
+    const [nextFavourite, setNextFavourite] = useState('');
+    const [myFavouritePokemons, setMyFavouritePokemons] = useState([] as string[]);
+
+    useEffect(() => {
+        if (nextFavourite !== '') {
+            const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
+            const qSnapshot = getDocs(userDocumentQuery);
+            qSnapshot.then((QuerySnapshot) => {
+                let UserDocumentIdentifier: string = QuerySnapshot.docs[0].id;
+                let favouritePokemonList: string[] = QuerySnapshot.docs[0].data().favouritePokemonList;
+                /* UPDATE SECTION */
+                let userDataDBRef = doc(db, 'user-data', UserDocumentIdentifier);
+                favouritePokemonList.push(nextFavourite);
+                setMyFavouritePokemons(favouritePokemonList);
+
+                updateDoc(userDataDBRef, { favouritePokemonList: favouritePokemonList })
+                    .then(() => { setNextFavourite(''); })
+                    .catch(err => { console.log(err) });
+            }).catch(err => { console.log(err) });
+        }
+    }, [nextFavourite]);
+
+    const addToFavourites = (pokemonName: string) => {
+        setNextFavourite(pokemonName);
+    }
 
     const getHighlightedName = () => {
         if (props.searchTerm) {
@@ -38,12 +67,28 @@ const PokeCard = (props: PokeCardProps) => {
         return props.data.name;
     }
 
+    const getHeartIcon = (pokemonName: string) => {
+        if (myFavouritePokemons.includes(pokemonName)) {
+            return (
+                <IconButton onClick={() => addToFavourites(props.data.name)}>
+                    <FavoriteIcon />
+                </IconButton>
+            )
+        } else {
+            return (
+                <IconButton onClick={() => addToFavourites(props.data.name)}>
+                    <FavoriteBorderIcon />
+                </IconButton>
+            )
+        }
+    }
+
     return (
         <Card className='poke-card'>
             <CardContent>
                 <div className="poke-image-wrapper">
                     <div className="icon-wrapper">
-                        <IconButton>
+                        <IconButton onClick={() => addToFavourites(props.data.name)}>
                             <FavoriteBorderIcon />
                         </IconButton>
                     </div>
