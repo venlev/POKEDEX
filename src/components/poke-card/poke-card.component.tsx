@@ -26,10 +26,12 @@ export type PokeCardProps = {
 
 const PokeCard = (props: PokeCardProps) => {
     const [nextFavourite, setNextFavourite] = useState('');
+    const [unfavourite, setUnfavourite] = useState('');
     const [myFavouritePokemons, setMyFavouritePokemons] = useState([] as string[]);
 
+    /* SET NEW FAVS */
     useEffect(() => {
-        if (nextFavourite !== '') {
+        if (nextFavourite !== '' || unfavourite !== '') {
             const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
             const qSnapshot = getDocs(userDocumentQuery);
             qSnapshot.then((QuerySnapshot) => {
@@ -37,7 +39,10 @@ const PokeCard = (props: PokeCardProps) => {
                 let favouritePokemonList: string[] = QuerySnapshot.docs[0].data().favouritePokemonList;
                 /* UPDATE SECTION */
                 let userDataDBRef = doc(db, 'user-data', UserDocumentIdentifier);
-                favouritePokemonList.push(nextFavourite);
+                (nextFavourite !== '')
+                    ? favouritePokemonList.push(nextFavourite)
+                    : favouritePokemonList = favouritePokemonList.filter(pokemon => pokemon !== unfavourite);
+
                 setMyFavouritePokemons(favouritePokemonList);
 
                 updateDoc(userDataDBRef, { favouritePokemonList: favouritePokemonList })
@@ -45,10 +50,24 @@ const PokeCard = (props: PokeCardProps) => {
                     .catch(err => { console.log(err) });
             }).catch(err => { console.log(err) });
         }
-    }, [nextFavourite]);
+    }, [nextFavourite, unfavourite]);
+
+    /* GET INITIAL FAVS */
+    useEffect(() => {
+        const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
+        const qSnapshot = getDocs(userDocumentQuery);
+        qSnapshot.then((QuerySnapshot) => {
+            setMyFavouritePokemons(QuerySnapshot.docs[0].data().favouritePokemonList);
+        }).catch(err => { console.log(err) });
+
+    }, []);
 
     const addToFavourites = (pokemonName: string) => {
         setNextFavourite(pokemonName);
+    }
+
+    const removeFromFavourites = (pokemonName: string) => {
+        setUnfavourite(pokemonName);
     }
 
     const getHighlightedName = () => {
@@ -70,7 +89,7 @@ const PokeCard = (props: PokeCardProps) => {
     const getHeartIcon = (pokemonName: string) => {
         if (myFavouritePokemons.includes(pokemonName)) {
             return (
-                <IconButton onClick={() => addToFavourites(props.data.name)}>
+                <IconButton onClick={() => removeFromFavourites(props.data.name)}>
                     <FavoriteIcon />
                 </IconButton>
             )
@@ -88,9 +107,7 @@ const PokeCard = (props: PokeCardProps) => {
             <CardContent>
                 <div className="poke-image-wrapper">
                     <div className="icon-wrapper">
-                        <IconButton onClick={() => addToFavourites(props.data.name)}>
-                            <FavoriteBorderIcon />
-                        </IconButton>
+                        {getHeartIcon(props.data.name)}
                     </div>
                     <img src={props.data.img} alt="" className="src" />
                 </div>
