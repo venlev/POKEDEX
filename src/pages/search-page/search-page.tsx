@@ -63,6 +63,10 @@ const SearchPage = () => {
         setPokemonName(e.target.value);
     }
 
+    const clearSearch = () => {
+        setPokemonName('');
+    }
+
     const renderPokeCards = () => {
         let PokeCardList = [];
 
@@ -82,6 +86,7 @@ const SearchPage = () => {
                     <TextField
                         placeholder="Search Pokémon..."
                         className='search-bar'
+                        value={pokemonName}
                         onChange={(event) => makeSearch(event)}
                         InputProps={{
                             startAdornment: (
@@ -91,7 +96,7 @@ const SearchPage = () => {
                             ),
                             endAdornment: (
                                 <IconButton>
-                                    <CancelIcon />
+                                    <CancelIcon onClick={clearSearch} />
                                 </IconButton>
                             )
                         }}
@@ -101,7 +106,7 @@ const SearchPage = () => {
                     <AccountPanel nickname={loggedInUser.nickname} />
                 </div>
                 <div id="poke-card-list-wrapper">
-                    { renderPokeCards() }
+                    {renderPokeCards()}
                 </div>
             </div>
         );

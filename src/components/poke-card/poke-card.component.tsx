@@ -36,21 +36,21 @@ const PokeCard = (props: PokeCardProps) => {
                         <Typography variant="subtitle1" gutterBottom>
                             {props.data.name}
                         </Typography>
-                        <PokeBadge />
+                        <PokeBadge type={props.data.type} />
                     </div>
                     <div className="stats">
                         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                             <Grid item xs={6}>
-                                <Chip icon={<FavoriteIcon />} label="HP 35" variant="outlined" />
+                                <Chip icon={<FavoriteIcon />} label={'HP ' + props.data.stats.hp} variant="outlined" />
                             </Grid>
                             <Grid item xs={6}>
-                                <Chip icon={<WhatshotIcon />} label="ATK 35" variant="outlined" />
+                                <Chip icon={<WhatshotIcon />} label={'ATK ' + props.data.stats.atk} variant="outlined" />
                             </Grid>
                             <Grid item xs={6}>
-                                <Chip icon={<ShieldIcon />} label="DEF 40" variant="outlined" />
+                                <Chip icon={<ShieldIcon />} label={'DEF ' + props.data.stats.def} variant="outlined" />
                             </Grid>
                             <Grid item xs={6}>
-                                <Chip icon={<AutoFixHighIcon />} label="SP 40" variant="outlined" />
+                                <Chip icon={<AutoFixHighIcon />} label={'SP ' + props.data.stats.sp} variant="outlined" />
                             </Grid>
                         </Grid>
                     </div>
