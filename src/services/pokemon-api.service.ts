@@ -54,7 +54,8 @@ const getPokeCardDataList = (suggestionList: string[]): Promise<PokemonCard[]> =
                                 front: pokemonData.sprites.front_female ? pokemonData.sprites.front_female : noImageAvailable,
                                 back: pokemonData.sprites.back_female ? pokemonData.sprites.back_female : noImageAvailable,
                             }
-                        }
+                        },
+                        abilities: pokemonData.abilities.map((abObject: any) => abObject.ability.name) || []
                     }
                     pokemonCardPreps.push(newPokemonCard);
                 }

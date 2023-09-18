@@ -51,17 +51,19 @@ const WelcomePanel = () => {
     }, []);
 
     const saveAccountSettings = () => {
-        const _uid = getUser().user.uid;
-        const data: UserData = {
-            uid: _uid,
-            nickname: nickname,
-            favouritePokemonTypes: favouritePokemonTypes,
-            favouritePokemonList: []
-        }
-        const _collectionReference = collection(db, 'user-data');
-        addDoc(_collectionReference, data).then(() => {
-            navigate("/search");
-        }).catch(err => console.log(err));
+        if (nickname && nickname.length > 3 && nickname.length < 20) {
+            const _uid = getUser().user.uid;
+            const data: UserData = {
+                uid: _uid,
+                nickname: nickname,
+                favouritePokemonTypes: favouritePokemonTypes,
+                favouritePokemonList: []
+            }
+            const _collectionReference = collection(db, 'user-data');
+            addDoc(_collectionReference, data).then(() => {
+                navigate("/search");
+            }).catch(err => console.log(err));
+        } else window.alert('Error: Invalid nickname! Your nickname must be between 3 and 20 characters!')
     }
 
     const updateAccountSettings = () => {
@@ -89,7 +91,13 @@ const WelcomePanel = () => {
             <div id='welcome-panel-container'>
                 <div id="name-inquiry-wrapper">
                     <h3 className='name-inquiry'>What is your name?</h3>
-                    <TextField label="Nickname" variant="outlined" color='primary' placeholder='Mr. Raptor' value={nickname} onChange={(e) => setNickname(e.target.value)} />
+                    <TextField 
+                    label="Nickname" 
+                    variant="outlined" 
+                    color='primary' 
+                    placeholder='Mr. Raptor' 
+                    value={nickname} onChange={(e) => setNickname(e.target.value)} 
+                    inputProps={{maxLength: 20}}/>
                 </div>
                 <div id="favourite-pokemon-wrapper">
                     <h3 className='name-inquiry'>What are your favourite pokemon types?</h3>
@@ -110,7 +118,7 @@ const WelcomePanel = () => {
     const redirectToSearch = () => {
         //navigate("/search");
         return (
-            <PokedexLoader next="/search"/>
+            <PokedexLoader next="/search" />
         )
     }
 

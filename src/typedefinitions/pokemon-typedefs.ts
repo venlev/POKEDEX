@@ -22,7 +22,8 @@ export type PokemonCard = {
             front: string,
             back: string
         }
-    }
+    },
+    abilities: string[]
 }
 
 export type PokemonStats = {

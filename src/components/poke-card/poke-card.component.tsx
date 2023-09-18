@@ -105,7 +105,7 @@ const PokeCard = (props: PokeCardProps) => {
     }
 
     return (
-        <Card className='poke-card'>
+        <Card className='poke-card' key={props.data.name.replace(' ', '_') + '_card'}>
             <CardContent>
                 <div className="poke-image-wrapper">
                     <div className="icon-wrapper">

@@ -24,6 +24,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import LinearProgress from '@mui/material/LinearProgress';
+import { PokemonResultFilters } from '../../typedefinitions/utils-typedefs';
 
 const SearchPage = () => {
 
@@ -36,6 +37,8 @@ const SearchPage = () => {
     const [statPanelData, setStatPanelData] = useState({ data: {} as PokemonCard, open: false });
     const [openFilterDialog, setOpenFilterDialog] = useState(false);
     const [searchMessage, setSearchMessage] = useState<'none' | 'short-query' | 'loading' | 'no-result'>('none');
+    const [filters, setFilters] = useState<PokemonResultFilters>({} as PokemonResultFilters);
+    const [atkFilterBounds, setAtkFilterBounds] = useState<AttackFilterRange>({} as AttackFilterRange);
 
     useEffect(() => {
 
@@ -78,7 +81,34 @@ const SearchPage = () => {
         for (let type of uTypes) { options.push(<option value={type}>{type}</option>); }
 
         return options;
-    }, [pokemonCardResultList])
+    }, [pokemonCardResultList]);
+
+    const getAbilityFilters = useCallback(() => {
+        let abilityFilters: string[] = [];
+        let uAbilities: string[] = [];
+        let abilities = [];
+
+        for (let PCR of pokemonCardResultList) abilityFilters.push(...PCR.abilities);
+        abilityFilters.forEach(ability => { if (!uAbilities.includes(ability)) uAbilities.push(ability); });
+        for (let ability of uAbilities) { abilities.push(<option value={ability}>{ability}</option>); }
+
+        return abilities;
+    }, [pokemonCardResultList]);
+
+
+    const getAttackFilters = useCallback(() => {
+        let attackForces: number[] = [];
+
+        for (let PCR of pokemonCardResultList) attackForces.push(PCR.stats.atk);
+        let bottomValue = Math.min(...attackForces);
+        let ceilValue = Math.max(...attackForces);
+        let range: AttackFilterRange = { ceil: ceilValue, bottom: bottomValue };
+        setAtkFilterBounds(range);
+        filters.attackRange = { from: 0, to: 0 }
+        filters.attackRange.from = bottomValue;
+        filters.attackRange.to = ceilValue;
+
+    }, [pokemonCardResultList]);
 
     useEffect(() => {
         /* GET USER DATA */
@@ -176,6 +206,28 @@ const SearchPage = () => {
     }
 
     const renderFilters = () => {
+
+        const filterChange = (e: any, filterTarget: FilterTargetType) => {
+            getAttackFilters();
+            switch (filterTarget) {
+                case 'type':
+                    filters.type = e.target.value;
+                    break;
+                case 'ability':
+                    filters.ability = e.target.value;
+                    break;
+                case 'attack':
+                    filters.attackRange = { from: 0, to: 0 }
+                    filters.attackRange.from = e.target.value[0];
+                    filters.attackRange.to = e.target.value[1];
+                    break;
+            }
+        }
+
+        const searchByFilters = () => {
+            console.log(filters);
+        }
+
         return (
             <Dialog open={openFilterDialog} onClose={e => toggleFilterDialog('close')}>
                 <DialogTitle className='filter-dialog-header'>
@@ -191,7 +243,8 @@ const SearchPage = () => {
                                 <tr className='custom-tr'>
                                     <td>Filter by type</td>
                                     <td>
-                                        <select className='select'>
+                                        <select className='select' onChange={e => filterChange(e, 'type')}>
+                                            <option value="" disabled>Select type</option>
                                             {getTypeFilters()}
                                         </select>
                                     </td>
@@ -199,8 +252,9 @@ const SearchPage = () => {
                                 <tr className='custom-tr'>
                                     <td>Filter by ability</td>
                                     <td>
-                                        <select className='select'>
-                                            <option value="blin">Ability</option>
+                                        <select className='select' onChange={e => filterChange(e, 'ability')}>
+                                            <option value="" disabled>Select ability</option>
+                                            {getAbilityFilters()}
                                         </select>
                                     </td>
                                 </tr>
@@ -208,14 +262,17 @@ const SearchPage = () => {
                                     <td>Attack</td>
                                     <td>
                                         <Slider
-                                            value={[20, 37]}
+                                            value={[10, 40]}
+                                            min={atkFilterBounds.bottom}
+                                            max={atkFilterBounds.ceil}
                                             valueLabelDisplay="auto"
+                                            onChange={e => filterChange(e, 'attack')}
                                         />
                                     </td>
                                 </tr>
                                 <tr className='custom-tr'>
                                     <td colSpan={2}>
-                                        <Button variant="contained" className='filter-btn' endIcon={<FilterAltIcon />}>
+                                        <Button variant="contained" className='filter-btn' endIcon={<FilterAltIcon />} onClick={searchByFilters}>
                                             Filter results
                                         </Button>
                                     </td>
@@ -251,7 +308,7 @@ const SearchPage = () => {
                             ),
                             endAdornment: (
                                 <>
-                                    <IconButton onClick={e => toggleFilterDialog('open')}>
+                                    <IconButton onClick={e => toggleFilterDialog('open')} disabled={pokemonCardResultList.length === 0}>
                                         <FilterAltIcon />
                                     </IconButton>
                                     <IconButton onClick={clearSearch}>
@@ -263,7 +320,7 @@ const SearchPage = () => {
                     />
                 </div>
                 <div className="account-panel-wrapper">
-                    <AccountPanel nickname={loggedInUser.nickname} showFavourites={showFavourites} />
+                    <AccountPanel nickname={loggedInUser.nickname} showFavourites={showFavourites}/>
                 </div>
                 <div className="card-list-scroller">
                     <div id="poke-card-list-wrapper">
@@ -276,5 +333,8 @@ const SearchPage = () => {
 
     return loggedInUser && loggedInUser.uid ? searchPageMainContent() : <PokedexLoader />
 }
+
+type FilterTargetType = 'type' | 'ability' | 'attack';
+type AttackFilterRange = { ceil: number, bottom: number };
 
 export default SearchPage;
