@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './search-page.css';
 import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,6 +16,14 @@ import PokedexLoader from '../../components/loader/loader.component';
 import { searchInList } from '../../services/search.service';
 import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
 import StatPanel from '../../components/stat-panel/stat-panel.component';
+import Button from '@mui/material/Button';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import Slider from '@mui/material/Slider';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const SearchPage = () => {
 
@@ -26,6 +34,8 @@ const SearchPage = () => {
     const [pokemonCardResultList, setPokemonCardResultList] = useState([] as PokemonCard[]);
     const [, setNewState] = useState({});
     const [statPanelData, setStatPanelData] = useState({ data: {} as PokemonCard, open: false });
+    const [openFilterDialog, setOpenFilterDialog] = useState(false);
+    const [searchMessage, setSearchMessage] = useState<'none' | 'short-query' | 'loading'>('none');
 
     useEffect(() => {
 
@@ -34,7 +44,9 @@ const SearchPage = () => {
         if (timeoutContext) clearTimeout(timeoutContext);
         let isFavouritesAvailable: boolean = (loggedInUser.favouritePokemonList && loggedInUser.favouritePokemonList.length > 0);
 
-        if (pokemonName && pokemonName.length > 0 && pokemonName !== 'favourites') {
+        if (pokemonName && pokemonName.length >= 3 && pokemonName !== 'favourites') {
+            setPokemonCardResultList([]);
+            setSearchMessage('loading');
             let typePauseTimer = setTimeout(() => {
                 let suggestionList: string[] = searchInList(pokemonName, pokemons);
                 getPokeCardDataList(suggestionList).then(pokemonCardResultList => {
@@ -43,7 +55,7 @@ const SearchPage = () => {
             }, pauseMillis);
 
             setTimeoutContext(typePauseTimer);
-        }
+        } else if (pokemonName !== '') setSearchMessage('short-query');
 
 
         if (pokemonName === 'favourites' && isFavouritesAvailable) {
@@ -54,6 +66,18 @@ const SearchPage = () => {
 
         //console.log(`search: ${pokemonName} results: `, suggestionList);
     }, [pokemonName]);
+
+    const getTypeFilters = useCallback(() => {
+        let typeFilters: string[] = [];
+        let uTypes: string[] = [];
+        let options = [];
+
+        for (let PCR of pokemonCardResultList) typeFilters.push(PCR.type);
+        typeFilters.forEach(type => { if (!uTypes.includes(type)) uTypes.push(type); });
+        for (let type of uTypes) { options.push(<option value={type}>{type}</option>); }
+
+        return options;
+    }, [pokemonCardResultList])
 
     useEffect(() => {
         /* GET USER DATA */
@@ -75,6 +99,12 @@ const SearchPage = () => {
     const clearSearch = () => {
         setPokemonName('');
     }
+
+    const toggleFilterDialog = (direction: 'open' | 'close') => {
+        direction === 'close'
+            ? setOpenFilterDialog(false)
+            : setOpenFilterDialog(true);
+    };
 
     const updateFavourites = (updatedFavourites: string[]) => {
         loggedInUser.favouritePokemonList = updatedFavourites;
@@ -108,19 +138,91 @@ const SearchPage = () => {
     }
 
     const renderSearchHint = () => {
+        switch (searchMessage) {
+            case 'none':
+                return (
+                    <div id="search-hint">
+                        <h1>Start typing for search...</h1>
+                        <span>There is nothing to see yet; please start a search, and you can find your favourite pokemons. This search is powered by POKEAPI.CO!
+                            Do you know that there are over a 1000 pokemons to choose from? You can mark your favourite ones to find them later.
+                            If you have some pokemons marked, you can click on the "FAVOURITE POKEMONS" link or search "favourites" to see them!</span>
+                    </div>
+                )
+            case 'short-query':
+                return (
+                    <div id="search-hint">
+                        <h1>No results yet...</h1>
+                        <span>Typee three or more characters of the name of the pokemon you are looking for to begin search...</span>
+                    </div>
+                )
+            case 'loading':
+                return (
+                    <div id="search-hint">
+                        <h1>Loading...</h1>
+                        <span>Let me find the best results...</span>
+                        <LinearProgress />
+                    </div>
+                )
+        }
+    }
+
+    const renderFilters = () => {
         return (
-            <div id="search-hint">
-                <h1>Start typing for search...</h1>
-                <span>There is nothing to see yet; please start a search, and you can find your favourite pokemons. This search is powered by POKEAPI.CO!
-                    Do you know that there are over a 1000 pokemons to choose from? You can mark your favourite ones to find them later.
-                    If you have some pokemons marked, you can click on the "FAVOURITE POKEMONS" link or search "favourites" to see them!</span>
-            </div>
+            <Dialog open={openFilterDialog} onClose={e => toggleFilterDialog('close')}>
+                <DialogTitle className='filter-dialog-header'>
+                    Filter in search results...
+                    <IconButton className='filter-dialog-close' onClick={e => { toggleFilterDialog('close'); }}>
+                        <CancelIcon color='error' />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <div id="filter-bar">
+                        <table>
+                            <tbody>
+                                <tr className='custom-tr'>
+                                    <td>Filter by type</td>
+                                    <td>
+                                        <select className='select'>
+                                            {getTypeFilters()}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr className='custom-tr'>
+                                    <td>Filter by ability</td>
+                                    <td>
+                                        <select className='select'>
+                                            <option value="blin">Ability</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr className='custom-tr'>
+                                    <td>Attack</td>
+                                    <td>
+                                        <Slider
+                                            value={[20, 37]}
+                                            valueLabelDisplay="auto"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr className='custom-tr'>
+                                    <td colSpan={2}>
+                                        <Button variant="contained" className='filter-btn' endIcon={<FilterAltIcon />}>
+                                            Filter results
+                                        </Button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </DialogContent>
+            </Dialog>
         )
     }
 
     const searchPageMainContent = () => {
         return (
             <div id="search-page-main">
+                {renderFilters()}
                 <StatPanel
                     open={statPanelData.open}
                     close={(e: boolean) => { if (e) statPanelData.open = false; }}
@@ -139,9 +241,14 @@ const SearchPage = () => {
                                 </IconButton>
                             ),
                             endAdornment: (
-                                <IconButton onClick={clearSearch}>
-                                    <CancelIcon />
-                                </IconButton>
+                                <>
+                                    <IconButton onClick={e => toggleFilterDialog('open')}>
+                                        <FilterAltIcon />
+                                    </IconButton>
+                                    <IconButton onClick={clearSearch}>
+                                        <CancelIcon />
+                                    </IconButton>
+                                </>
                             )
                         }}
                     />
@@ -151,7 +258,7 @@ const SearchPage = () => {
                 </div>
                 <div className="card-list-scroller">
                     <div id="poke-card-list-wrapper">
-                        {pokemonName === '' ? renderSearchHint() : renderPokeCards()}
+                        {pokemonCardResultList.length === 0 ? renderSearchHint() : renderPokeCards()}
                     </div>
                 </div>
             </div>
