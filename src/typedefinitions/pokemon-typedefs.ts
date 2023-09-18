@@ -11,7 +11,18 @@ export type PokemonCard = {
     name: string,
     type: string,
     stats: PokemonStats,
-    favourite?: boolean
+    favourite?: boolean,
+    images: {
+        male: {
+            front: string,
+            back: string
+        },
+        female: {
+            isFemale: boolean,
+            front: string,
+            back: string
+        }
+    }
 }
 
 export type PokemonStats = {

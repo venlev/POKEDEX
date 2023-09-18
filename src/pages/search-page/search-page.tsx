@@ -90,11 +90,11 @@ const SearchPage = () => {
         if (pokemonCardResultList.length > 0) {
             for (let pokemonResultCard of pokemonCardResultList) {
                 PokeCardList.push(
-                    <div onClick={e => {pokemonCardOnClick(pokemonResultCard); e.stopPropagation();}}>
+                    <div onClick={e => { pokemonCardOnClick(pokemonResultCard); e.stopPropagation(); }}>
                         <PokeCard
                             data={pokemonResultCard}
                             searchTerm={pokemonName}
-                            updateFavourites={(v: string[]) => updateFavourites(v)}
+                            updateFavourites={(v: string[]) => { updateFavourites(v); setNewState({}) }}
                         />
                     </div>);
             }
@@ -124,7 +124,8 @@ const SearchPage = () => {
                 <StatPanel
                     open={statPanelData.open}
                     close={(e: boolean) => { if (e) statPanelData.open = false; }}
-                    data={statPanelData.data} />
+                    data={statPanelData.data}
+                    updateFavourites={(v: string[]) => { updateFavourites(v); setNewState({}) }} />
                 <div className="search-wrapper">
                     <TextField
                         placeholder="Search Pokémon..."

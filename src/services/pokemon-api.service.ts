@@ -43,6 +43,17 @@ const getPokeCardDataList = (suggestionList: string[]): Promise<PokemonCard[]> =
                             sp: statStore['special-attack'],
                             atk: statStore.attack,
                             def: statStore.defense
+                        },
+                        images: {
+                            male: {
+                                front: pokemonData.sprites.front_default ? pokemonData.sprites.front_default : noImageAvailable,
+                                back: pokemonData.sprites.back_default ? pokemonData.sprites.back_default : noImageAvailable
+                            },
+                            female: {
+                                isFemale: (pokemonData.sprites.front_female || pokemonData.sprites.back_female) ? true : false,
+                                front: pokemonData.sprites.front_female ? pokemonData.sprites.front_female : noImageAvailable,
+                                back: pokemonData.sprites.back_female ? pokemonData.sprites.back_female : noImageAvailable,
+                            }
                         }
                     }
                     pokemonCardPreps.push(newPokemonCard);

@@ -1,12 +1,10 @@
-import Card from '@mui/material/Card';
 import './stat-panel.component.css';
 import PokeBadge from '../poke-badge/poke-badge.component';
-import Backdrop from '@mui/material/Backdrop';
 import IconButton from '@mui/material/IconButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useEffect, useState } from 'react';
-import { Button, ButtonGroup, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, useMediaQuery, useTheme } from '@mui/material';
+import { Button, ButtonGroup, Chip, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import ShieldIcon from '@mui/icons-material/Shield';
@@ -14,22 +12,66 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import { PokemonCard } from '../../typedefinitions/pokemon-typedefs';
+import { UserData } from '../../typedefinitions/user-data-typedefs';
+import { collection, query, where, getDocs, doc, updateDoc } from '@firebase/firestore';
+import { db } from '../../firebase';
+import { getUser } from '../../services/user-store.service';
 
 export type StatPanelProps = {
     data: PokemonCard
     open: boolean
     close: any,
+    updateFavourites?: any;
 }
 
 const StatPanel = (props: StatPanelProps) => {
     const [open, setOpen] = useState(props.open || false);
-    const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
+    const [pokemonGender, setPokemonGender] = useState<'male' | 'female'>('male');
+    const [pokemonSide, setPokemonSide] = useState<'front' | 'back'>('front');
+    const [loggedInUser, setLoggedInUser] = useState({} as UserData);
+    const [nextFavourite, setNextFavourite] = useState('');
+    const [unfavourite, setUnfavourite] = useState('');
+    const [myFavouritePokemons, setMyFavouritePokemons] = useState([] as string[]);
 
     useEffect(() => {
         if (props.open) handleClickOpen();
-    }, [props])
+    }, [props]);
+
+    /* GLUser */
+    useEffect(() => {
+        const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
+        const qSnapshot = getDocs(userDocumentQuery);
+        qSnapshot.then((QuerySnapshot) => {
+            const QueryDocumentSnapshot = QuerySnapshot.docs[0];
+            setLoggedInUser(QueryDocumentSnapshot.data() as UserData);
+        }).catch(err => console.log(err));
+    }, []);
+
+    /* SET NEW FAVS */
+    useEffect(() => {
+        if (nextFavourite !== '' || unfavourite !== '') {
+            const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
+            const qSnapshot = getDocs(userDocumentQuery);
+            qSnapshot.then((QuerySnapshot) => {
+                let UserDocumentIdentifier: string = QuerySnapshot.docs[0].id;
+                let favouritePokemonList: string[] = QuerySnapshot.docs[0].data().favouritePokemonList;
+
+                let userDataDBRef = doc(db, 'user-data', UserDocumentIdentifier);
+                (nextFavourite !== '')
+                    ? favouritePokemonList.push(nextFavourite)
+                    : favouritePokemonList = favouritePokemonList.filter(pokemon => pokemon !== unfavourite);
+
+                setMyFavouritePokemons(favouritePokemonList);
+
+                updateDoc(userDataDBRef, { favouritePokemonList: favouritePokemonList })
+                    .then(() => {
+                        setNextFavourite('');
+                        props.updateFavourites(favouritePokemonList);
+                    })
+                    .catch(err => { console.log(err) });
+            }).catch(err => { console.log(err) });
+        }
+    }, [nextFavourite, unfavourite]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -37,8 +79,57 @@ const StatPanel = (props: StatPanelProps) => {
 
     const handleClose = () => {
         props.close(true);
+        setPokemonGender('male'); setPokemonSide('front');
         setOpen(false);
     };
+
+    const addToFavourites = (pokemonName: string) => {
+        setNextFavourite(pokemonName);
+    }
+
+    const removeFromFavourites = (pokemonName: string) => {
+        setUnfavourite(pokemonName);
+    }
+
+    const showPokemonSide = (side: 'front' | 'back'): string => {
+        switch (side) {
+            case 'front':
+                return (
+                    pokemonGender === 'male'
+                        ? props.data.images.male.front
+                        : props.data.images.female.front
+                );
+
+            case 'back':
+                return (
+                    pokemonGender === 'male'
+                        ? props.data.images.male.back
+                        : props.data.images.female.back
+                );
+        }
+    }
+
+    const getHeart = (pokemonName: string) => {
+        let favourite: boolean = loggedInUser.favouritePokemonList.includes(pokemonName) || false;
+
+        const showFavourite = () => {
+            return (
+                <IconButton onClick={(e) => { removeFromFavourites(props.data.name); e.stopPropagation(); }} >
+                    <FavoriteIcon className='heart' />
+                </IconButton>
+            )
+        }
+
+        const showNonFavourite = () => {
+            return (
+                <IconButton onClick={(e) => { addToFavourites(props.data.name); e.stopPropagation(); }}>
+                    <FavoriteBorderIcon className='heart' />
+                </IconButton>
+            )
+        }
+
+        return favourite ? showFavourite() : showNonFavourite();
+    }
 
     const renderStatPanelDialog = () => {
         return (
@@ -56,11 +147,9 @@ const StatPanel = (props: StatPanelProps) => {
                                 <PokeBadge type={props.data.type} />
                             </div>
                             <div className="action-buttons">
-                                <IconButton>
-                                    <FavoriteBorderIcon />
-                                </IconButton>
-                                <IconButton>
-                                    <CancelIcon />
+                                {getHeart(props.data.name)}
+                                <IconButton onClick={e => { handleClose(); e.stopPropagation(); }}>
+                                    <CancelIcon className='closeIB' />
                                 </IconButton>
                             </div>
                         </div>
@@ -83,10 +172,10 @@ const StatPanel = (props: StatPanelProps) => {
                                     </table>
                                 </div>
                                 <div className="male-female-selection-menu">
-                                    <IconButton >
+                                    <IconButton disabled={!props.data.images.female.isFemale} onClick={e => { setPokemonGender('female'); e.stopPropagation(); }}>
                                         <FemaleIcon className='mf-selector' />
                                     </IconButton>
-                                    <IconButton>
+                                    <IconButton onClick={e => { setPokemonGender('male'); e.stopPropagation(); }}>
                                         <MaleIcon className='mf-selector' />
                                     </IconButton>
                                 </div>
@@ -97,13 +186,13 @@ const StatPanel = (props: StatPanelProps) => {
                                         variant="contained"
                                         aria-label="Disabled elevation buttons"
                                     >
-                                        <Button>Front</Button>
-                                        <Button>Back</Button>
+                                        <Button onClick={e => { setPokemonSide('front'); e.stopPropagation(); }}>Front</Button>
+                                        <Button onClick={e => { setPokemonSide('back'); e.stopPropagation(); }}>Back</Button>
                                     </ButtonGroup>
                                 </div>
                             </div>
                             <div id="rigth-side">
-                                <img src={props.data.img} alt="" className='pokemon-preview' />
+                                <img src={showPokemonSide(pokemonSide)} alt="" className='pokemon-preview' />
                             </div>
                         </div>
                     </DialogContent>

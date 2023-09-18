@@ -75,3 +75,11 @@
 #\#stat-dialog>div.MuiDialog-container.MuiDialog-scrollPaper.css-hz1bth-MuiDialog-container>div {
     width: 80%;
 }
+
+.closeIB {
+    color: black;
+}
+
+.heart {
+    color: red;
+}
