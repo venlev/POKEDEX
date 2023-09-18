@@ -101,7 +101,7 @@
     font-size: 12pt;
 }
 
-.filter-btn{
+.filter-btn {
     width: 100%;
     margin-top: 20px !important;
 }
@@ -114,4 +114,13 @@
 .filter-dialog-close {
     align-self: flex-end;
     margin-left: auto !important;
+}
+
+.progress-bar {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.hint-title {
+    margin: 0px;
 }

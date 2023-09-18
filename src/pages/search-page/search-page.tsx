@@ -35,7 +35,7 @@ const SearchPage = () => {
     const [, setNewState] = useState({});
     const [statPanelData, setStatPanelData] = useState({ data: {} as PokemonCard, open: false });
     const [openFilterDialog, setOpenFilterDialog] = useState(false);
-    const [searchMessage, setSearchMessage] = useState<'none' | 'short-query' | 'loading'>('none');
+    const [searchMessage, setSearchMessage] = useState<'none' | 'short-query' | 'loading' | 'no-result'>('none');
 
     useEffect(() => {
 
@@ -49,6 +49,7 @@ const SearchPage = () => {
             setSearchMessage('loading');
             let typePauseTimer = setTimeout(() => {
                 let suggestionList: string[] = searchInList(pokemonName, pokemons);
+                if (suggestionList.length === 0) setSearchMessage('no-result');
                 getPokeCardDataList(suggestionList).then(pokemonCardResultList => {
                     setPokemonCardResultList(pokemonCardResultList);
                 });
@@ -158,9 +159,17 @@ const SearchPage = () => {
             case 'loading':
                 return (
                     <div id="search-hint">
-                        <h1>Loading...</h1>
+                        <h1 className="hint-title">Loading...</h1>
                         <span>Let me find the best results...</span>
-                        <LinearProgress />
+                        <LinearProgress className='progress-bar' />
+                    </div>
+                )
+
+            case 'no-result':
+                return (
+                    <div id="search-hint">
+                        <h1>No results...</h1>
+                        <span>It seems like we couldn't find a pokemon with this name. Make sure you typed the search term correctly.</span>
                     </div>
                 )
         }
