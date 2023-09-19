@@ -38,7 +38,6 @@ const SearchPage = () => {
     const [openFilterDialog, setOpenFilterDialog] = useState(false);
     const [searchMessage, setSearchMessage] = useState<'none' | 'short-query' | 'loading' | 'no-result'>('none');
     const [filters, setFilters] = useState<PokemonResultFilters>({} as PokemonResultFilters);
-    const [atkFilterBounds, setAtkFilterBounds] = useState<AttackFilterRange>({} as AttackFilterRange);
 
     useEffect(() => {
 
@@ -93,21 +92,6 @@ const SearchPage = () => {
         for (let ability of uAbilities) { abilities.push(<option value={ability}>{ability}</option>); }
 
         return abilities;
-    }, [pokemonCardResultList]);
-
-
-    const getAttackFilters = useCallback(() => {
-        let attackForces: number[] = [];
-
-        for (let PCR of pokemonCardResultList) attackForces.push(PCR.stats.atk);
-        let bottomValue = Math.min(...attackForces);
-        let ceilValue = Math.max(...attackForces);
-        let range: AttackFilterRange = { ceil: ceilValue, bottom: bottomValue };
-        setAtkFilterBounds(range);
-        filters.attackRange = { from: 0, to: 0 }
-        filters.attackRange.from = bottomValue;
-        filters.attackRange.to = ceilValue;
-
     }, [pokemonCardResultList]);
 
     useEffect(() => {
@@ -208,7 +192,7 @@ const SearchPage = () => {
     const renderFilters = () => {
 
         const filterChange = (e: any, filterTarget: FilterTargetType) => {
-            getAttackFilters();
+            //getAttackFilters();
             switch (filterTarget) {
                 case 'type':
                     filters.type = e.target.value;
@@ -217,15 +201,30 @@ const SearchPage = () => {
                     filters.ability = e.target.value;
                     break;
                 case 'attack':
-                    filters.attackRange = { from: 0, to: 0 }
-                    filters.attackRange.from = e.target.value[0];
-                    filters.attackRange.to = e.target.value[1];
                     break;
             }
         }
 
         const searchByFilters = () => {
-            console.log(filters);
+            setNewState({});
+            let filterResults: PokemonCard[] = [];
+
+            if (filters.type && filters.type !== '') {
+                filterResults.push(...pokemonCardResultList.filter((card: PokemonCard) => {
+                    return card.type === filters.type;
+                }));
+            } else { filterResults = pokemonCardResultList }
+            if (filters.ability && filters.ability !== '') {
+                filterResults = filterResults.filter((card: PokemonCard) => {
+                    return card.abilities.includes(filters.ability);
+                });
+            }
+            setPokemonCardResultList(filterResults);
+        }
+
+        const clearFilters = () => { 
+            setFilters({} as PokemonResultFilters); 
+            setPokemonName('');
         }
 
         return (
@@ -244,7 +243,7 @@ const SearchPage = () => {
                                     <td>Filter by type</td>
                                     <td>
                                         <select className='select' onChange={e => filterChange(e, 'type')}>
-                                            <option value="" disabled>Select type</option>
+                                            <option value="default" defaultValue={'default'}>Select type</option>
                                             {getTypeFilters()}
                                         </select>
                                     </td>
@@ -253,27 +252,22 @@ const SearchPage = () => {
                                     <td>Filter by ability</td>
                                     <td>
                                         <select className='select' onChange={e => filterChange(e, 'ability')}>
-                                            <option value="" disabled>Select ability</option>
+                                            <option value="default" defaultValue={'default'}>Select ability</option>
                                             {getAbilityFilters()}
                                         </select>
-                                    </td>
-                                </tr>
-                                <tr className='custom-tr'>
-                                    <td>Attack</td>
-                                    <td>
-                                        <Slider
-                                            value={[10, 40]}
-                                            min={atkFilterBounds.bottom}
-                                            max={atkFilterBounds.ceil}
-                                            valueLabelDisplay="auto"
-                                            onChange={e => filterChange(e, 'attack')}
-                                        />
                                     </td>
                                 </tr>
                                 <tr className='custom-tr'>
                                     <td colSpan={2}>
                                         <Button variant="contained" className='filter-btn' endIcon={<FilterAltIcon />} onClick={searchByFilters}>
                                             Filter results
+                                        </Button>
+                                    </td>
+                                </tr>
+                                <tr className='custom-tr'>
+                                    <td colSpan={2}>
+                                        <Button variant="contained" color='error' className='filter-btn' endIcon={<FilterAltIcon />} onClick={clearFilters}>
+                                            Clear filters
                                         </Button>
                                     </td>
                                 </tr>
@@ -320,7 +314,7 @@ const SearchPage = () => {
                     />
                 </div>
                 <div className="account-panel-wrapper">
-                    <AccountPanel nickname={loggedInUser.nickname} showFavourites={showFavourites}/>
+                    <AccountPanel nickname={loggedInUser.nickname} showFavourites={showFavourites} />
                 </div>
                 <div className="card-list-scroller">
                     <div id="poke-card-list-wrapper">
