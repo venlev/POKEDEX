@@ -21,6 +21,7 @@ export type PokeCardProps = {
     data: PokemonCard,
     searchTerm?: string,
     updateFavourites?: any,
+    reqRender?: any
 };
 
 const PokeCard = (props: PokeCardProps) => {
@@ -47,7 +48,6 @@ const PokeCard = (props: PokeCardProps) => {
                 updateDoc(userDataDBRef, { favouritePokemonList: favouritePokemonList })
                     .then(() => {
                         setNextFavourite('');
-                        props.updateFavourites(favouritePokemonList);
                     })
                     .catch(err => { console.log(err) });
             }).catch(err => { console.log(err) });
@@ -65,10 +65,12 @@ const PokeCard = (props: PokeCardProps) => {
     }, []);
 
     const addToFavourites = (pokemonName: string) => {
+        props.updateFavourites(true);
         setNextFavourite(pokemonName);
     }
 
     const removeFromFavourites = (pokemonName: string) => {
+        props.updateFavourites(true);
         setUnfavourite(pokemonName);
     }
 

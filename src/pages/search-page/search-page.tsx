@@ -38,9 +38,10 @@ const SearchPage = () => {
     const [openFilterDialog, setOpenFilterDialog] = useState(false);
     const [searchMessage, setSearchMessage] = useState<'none' | 'short-query' | 'loading' | 'no-result'>('none');
     const [filters, setFilters] = useState<PokemonResultFilters>({} as PokemonResultFilters);
+    const [favsUpdated, setFavsUpdated] = useState(false);
+    const [favourites, setFavourites] = useState([] as string[])
 
     useEffect(() => {
-
         /* TIMER TO WAIT USER TO FINISH TYPING BEFORE SENDING OUT TOO MANY REQS*/
         const pauseMillis = 2000; /* WAIT THIS AMOUNT OF TIME AFTER LAST KS*/
         if (timeoutContext) clearTimeout(timeoutContext);
@@ -66,8 +67,6 @@ const SearchPage = () => {
                 setPokemonCardResultList(pokemonCardResultList);
             });
         }
-
-        //console.log(`search: ${pokemonName} results: `, suggestionList);
     }, [pokemonName]);
 
     const getTypeFilters = useCallback(() => {
@@ -101,11 +100,24 @@ const SearchPage = () => {
         qSnapshot.then((QuerySnapshot) => {
             const QueryDocumentSnapshot = QuerySnapshot.docs[0];
             setLoggedInUser(QueryDocumentSnapshot.data() as UserData);
+            setFavourites(QueryDocumentSnapshot.data().favouritePokemonList);
         }).catch(err => console.log(err));
 
         /* GET POKEMONS LIST */
         getAllPokemonNames().then(pokemons => setPokemons(pokemons as string[]));
     }, []);
+
+    useEffect(() => {
+        const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
+        const qSnapshot = getDocs(userDocumentQuery);
+        qSnapshot.then((QuerySnapshot) => {
+            const QueryDocumentSnapshot = QuerySnapshot.docs[0];
+            setLoggedInUser(QueryDocumentSnapshot.data() as UserData);
+            setFavourites(QueryDocumentSnapshot.data().favouritePokemonList);
+            console.log(QueryDocumentSnapshot.data().favouritePokemonList)
+        }).catch(err => console.log(err));
+        setNewState({});
+    }, [favsUpdated])
 
     const makeSearch = (e: any) => {
         setPokemonName(e.target.value);
@@ -139,7 +151,7 @@ const SearchPage = () => {
                         <PokeCard
                             data={pokemonResultCard}
                             searchTerm={pokemonName}
-                            updateFavourites={(v: string[]) => { updateFavourites(v); setNewState({}) }}
+                            updateFavourites={(e: boolean) => { if (e) setFavsUpdated(e) }}
                         />
                     </div>);
             }
@@ -222,8 +234,8 @@ const SearchPage = () => {
             setPokemonCardResultList(filterResults);
         }
 
-        const clearFilters = () => { 
-            setFilters({} as PokemonResultFilters); 
+        const clearFilters = () => {
+            setFilters({} as PokemonResultFilters);
             setPokemonName('');
         }
 
@@ -280,6 +292,7 @@ const SearchPage = () => {
     }
 
     const searchPageMainContent = () => {
+
         return (
             <div id="search-page-main">
                 {renderFilters()}
@@ -314,7 +327,11 @@ const SearchPage = () => {
                     />
                 </div>
                 <div className="account-panel-wrapper">
-                    <AccountPanel nickname={loggedInUser.nickname} showFavourites={showFavourites} />
+                    <AccountPanel 
+                    nickname={loggedInUser.nickname} 
+                    showFavourites={showFavourites} 
+                    reqNewState={(e: boolean) => { if (e === true) { setNewState({}); } }} 
+                    favs={favourites}/>
                 </div>
                 <div className="card-list-scroller">
                     <div id="poke-card-list-wrapper">

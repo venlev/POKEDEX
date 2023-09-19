@@ -16,14 +16,18 @@ import heartPNG from '../../assets/heart.png';
 
 type AccountPanelProps = {
     nickname: string,
-    showFavourites?: any
+    showFavourites?: any,
+    reqNewState?: any;
+    favs: string[]
 }
 
 const AccountPanel = (props: AccountPanelProps) => {
 
     const navigate = useNavigate();
     const [favourites, setFavourites] = useState([] as string[]);
+    const [favouriteNames, setFavouriteNames] = useState([] as string[]);
     const [loggedInUser, setLoggedInUser] = useState({} as UserData);
+    const [, setNewState] = useState({});
 
     const logout = () => {
         sessionStorage.clear();
@@ -35,21 +39,19 @@ const AccountPanel = (props: AccountPanelProps) => {
     }
 
     useEffect(() => {
-        const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
-        const qSnapshot = getDocs(userDocumentQuery);
-        qSnapshot.then((QuerySnapshot) => {
-            const QueryDocumentSnapshot = QuerySnapshot.docs[0];
-            setLoggedInUser(QueryDocumentSnapshot.data() as UserData);
-        }).catch(err => console.log(err));
-    });
+        setFavouriteNames(props.favs);
+        setTimeout(()=>{
+            setNewState({});
+        }, 300)
+    }, [props]);
 
     useEffect(() => {
-        if (loggedInUser.favouritePokemonList && loggedInUser.favouritePokemonList.length > 0) {
-            getPokeCardDataList(loggedInUser.favouritePokemonList).then(pokemonCardResultList => {
+        if (favouriteNames && favouriteNames.length > 0) {
+            getPokeCardDataList(favouriteNames).then(pokemonCardResultList => {
                 for (let PCR of pokemonCardResultList) { favourites.push(PCR.img) }
             });
         }
-    }, [loggedInUser]);
+    }, [favouriteNames]);
 
     const getFavIcon = (index: number) => {
         if (favourites.length >= 3) {
