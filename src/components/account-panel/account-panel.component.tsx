@@ -34,8 +34,8 @@ const AccountPanel = (props: AccountPanelProps) => {
 
     useEffect(() => {
         setFavouriteNames(props.favs);
-        
-        setTimeout(()=>{
+
+        setTimeout(() => {
             setNewState({});
         }, 300)
     }, [props]);
@@ -44,7 +44,7 @@ const AccountPanel = (props: AccountPanelProps) => {
         if (favouriteNames && favouriteNames.length > 0) {
             getPokeCardDataList(favouriteNames).then(pokemonCardResultList => {
                 let newFavsArray: string[] = [];
-                for (let PCR of pokemonCardResultList) { 
+                for (let PCR of pokemonCardResultList) {
                     newFavsArray.push(PCR.img)
                 }
                 setFavourites(newFavsArray);
