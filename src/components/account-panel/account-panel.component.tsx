@@ -7,17 +7,12 @@ import IconButton from '@mui/material/IconButton/IconButton';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { collection, query, where, getDocs } from '@firebase/firestore';
 import { getPokeCardDataList } from '../../services/pokemon-api.service';
-import { db } from '../../firebase';
-import { UserData } from '../../typedefinitions/user-data-typedefs';
-import { getUser } from '../../services/user-store.service';
 import heartPNG from '../../assets/heart.png';
 
 type AccountPanelProps = {
     nickname: string,
     showFavourites?: any,
-    reqNewState?: any;
     favs: string[]
 }
 
@@ -26,7 +21,6 @@ const AccountPanel = (props: AccountPanelProps) => {
     const navigate = useNavigate();
     const [favourites, setFavourites] = useState([] as string[]);
     const [favouriteNames, setFavouriteNames] = useState([] as string[]);
-    const [loggedInUser, setLoggedInUser] = useState({} as UserData);
     const [, setNewState] = useState({});
 
     const logout = () => {
@@ -40,6 +34,7 @@ const AccountPanel = (props: AccountPanelProps) => {
 
     useEffect(() => {
         setFavouriteNames(props.favs);
+        
         setTimeout(()=>{
             setNewState({});
         }, 300)
@@ -48,7 +43,11 @@ const AccountPanel = (props: AccountPanelProps) => {
     useEffect(() => {
         if (favouriteNames && favouriteNames.length > 0) {
             getPokeCardDataList(favouriteNames).then(pokemonCardResultList => {
-                for (let PCR of pokemonCardResultList) { favourites.push(PCR.img) }
+                let newFavsArray: string[] = [];
+                for (let PCR of pokemonCardResultList) { 
+                    newFavsArray.push(PCR.img)
+                }
+                setFavourites(newFavsArray);
             });
         }
     }, [favouriteNames]);

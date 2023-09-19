@@ -38,7 +38,7 @@ const SearchPage = () => {
     const [openFilterDialog, setOpenFilterDialog] = useState(false);
     const [searchMessage, setSearchMessage] = useState<'none' | 'short-query' | 'loading' | 'no-result'>('none');
     const [filters, setFilters] = useState<PokemonResultFilters>({} as PokemonResultFilters);
-    const [favsUpdated, setFavsUpdated] = useState(false);
+    const [favsUpdated, setFavsUpdated] = useState({});
     const [favourites, setFavourites] = useState([] as string[])
 
     useEffect(() => {
@@ -108,15 +108,15 @@ const SearchPage = () => {
     }, []);
 
     useEffect(() => {
-        const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
-        const qSnapshot = getDocs(userDocumentQuery);
-        qSnapshot.then((QuerySnapshot) => {
-            const QueryDocumentSnapshot = QuerySnapshot.docs[0];
-            setLoggedInUser(QueryDocumentSnapshot.data() as UserData);
-            setFavourites(QueryDocumentSnapshot.data().favouritePokemonList);
-            console.log(QueryDocumentSnapshot.data().favouritePokemonList)
-        }).catch(err => console.log(err));
-        setNewState({});
+        setTimeout(() => {
+            const userDocumentQuery = query(collection(db, "user-data"), where("uid", "==", getUser().user.uid));
+            const qSnapshot = getDocs(userDocumentQuery);
+            qSnapshot.then((QuerySnapshot) => {
+                const QueryDocumentSnapshot = QuerySnapshot.docs[0];
+                setLoggedInUser(QueryDocumentSnapshot.data() as UserData);
+                setFavourites(QueryDocumentSnapshot.data().favouritePokemonList);
+            }).catch(err => console.log(err));
+        }, 500);
     }, [favsUpdated])
 
     const makeSearch = (e: any) => {
@@ -151,7 +151,7 @@ const SearchPage = () => {
                         <PokeCard
                             data={pokemonResultCard}
                             searchTerm={pokemonName}
-                            updateFavourites={(e: boolean) => { if (e) setFavsUpdated(e) }}
+                            updateFavourites={(e: boolean) => { if (e) setFavsUpdated({}) }}
                         />
                     </div>);
             }
@@ -327,11 +327,10 @@ const SearchPage = () => {
                     />
                 </div>
                 <div className="account-panel-wrapper">
-                    <AccountPanel 
-                    nickname={loggedInUser.nickname} 
-                    showFavourites={showFavourites} 
-                    reqNewState={(e: boolean) => { if (e === true) { setNewState({}); } }} 
-                    favs={favourites}/>
+                    <AccountPanel
+                        nickname={loggedInUser.nickname}
+                        showFavourites={showFavourites}
+                        favs={favourites} />
                 </div>
                 <div className="card-list-scroller">
                     <div id="poke-card-list-wrapper">

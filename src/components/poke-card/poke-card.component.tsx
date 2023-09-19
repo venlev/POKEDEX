@@ -44,7 +44,7 @@ const PokeCard = (props: PokeCardProps) => {
                     : favouritePokemonList = favouritePokemonList.filter(pokemon => pokemon !== unfavourite);
 
                 setMyFavouritePokemons(favouritePokemonList);
-
+                
                 updateDoc(userDataDBRef, { favouritePokemonList: favouritePokemonList })
                     .then(() => {
                         setNextFavourite('');
